@@ -9,6 +9,8 @@ public class PlayerMovementScript : MonoBehaviour
     private CharacterController _controller;
     
     [SerializeField] private float runSpeed;
+    [SerializeField] private float sprintSpeed;
+    [SerializeField] private float crouchSpeed;
     [SerializeField] private int jumpCharges;
     [SerializeField] private float jumpHeight;
     [SerializeField] private float gravity;
@@ -25,6 +27,8 @@ public class PlayerMovementScript : MonoBehaviour
     
     private float _speed;
     private bool _isGrounded;
+    private bool _isCrouching;
+    private bool _isSprinting;
     
 
     private void Start()
@@ -42,6 +46,16 @@ public class PlayerMovementScript : MonoBehaviour
         if (Input.GetKeyUp(KeyCode.Space) && jumpCharges > 0)
         {
             Jump();
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            Crouch();
+        }
+
+        if (Input.GetKeyUp(KeyCode.LeftControl))
+        {
+            ExitCrouch();
         }
     }
 
@@ -64,7 +78,7 @@ public class PlayerMovementScript : MonoBehaviour
 
     void GroundedMovement()
     {
-        _speed = runSpeed;
+        _speed = _isSprinting ? sprintSpeed : _isCrouching ? crouchSpeed : runSpeed;
         if (_input.x != 0)
         {
             _move.x += _input.x * _speed;
@@ -115,6 +129,16 @@ public class PlayerMovementScript : MonoBehaviour
     {
         _yVelocity.y = Mathf.Sqrt(jumpHeight * -2f * normalGravity);
         jumpCharges--;
+    }
+
+    void Crouch()
+    {
+        
+    }
+
+    void Sprinting()
+    {
+        
     }
 }
 
