@@ -6,41 +6,115 @@ using UnityEngine;
 
 public class PlayerMovementScript : MonoBehaviour
 {
-    public CharacterController controller;
-
-    [SerializeField] private float playerSpeed = 10f;
-    [SerializeField] private float gravity = -5f;
-
+    private CharacterController _controller;
+    
+    [SerializeField] private float runSpeed;
+    [SerializeField] private int jumpCharges;
+    [SerializeField] private float jumpHeight;
+    [SerializeField] private float gravity;
+    [SerializeField] private float normalGravity;
+    [SerializeField] private float airSpeed;
     public Transform groundCheck;
-    public float groundDistance = 0.4f;
     public LayerMask groundMask;
+    public float groundDistance = 0.4f;
 
-    private Vector3 _velocity;
+    private Vector3 _move;
+    private Vector3 _input;
+    private Vector3 _yVelocity;
+
+    
+    private float _speed;
     private bool _isGrounded;
+    
 
-    // Fixed Update for physics checks
-    private void FixedUpdate()
+    private void Start()
     {
-        _isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        _controller = GetComponent<CharacterController>();
+    }
 
-        if (_isGrounded && _velocity.y < 0)
+    void HandleInput()
+    {
+        _input = new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
+        
+        _input = transform.TransformDirection(_input);
+        _input = Vector3.ClampMagnitude(_input, 1f);
+
+        if (Input.GetKeyUp(KeyCode.Space) && jumpCharges > 0)
         {
-            _velocity.y = -2f;
+            Jump();
         }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
+        HandleInput();
+        GroundedMovement();
+        if (_isGrounded)
+        {
+            GroundedMovement();
+        }
+        else
+        {
+            AirMovement();
+        }
+        CheckGround();
+        _controller.Move(_move * Time.deltaTime);
+        ApplyGravity();
+    }
 
-        Vector3 move = transform.right * x + transform.forward * z;
+    void GroundedMovement()
+    {
+        _speed = runSpeed;
+        if (_input.x != 0)
+        {
+            _move.x += _input.x * _speed;
+        }
+        else
+        {
+            _move.x = 0;
+        }
 
-        controller.Move(move * (playerSpeed * Time.deltaTime));
+        if (_input.z != 0)
+        {
+            _move.z += _input.z * _speed;
+        }
+        else
+        {
+            _move.z = 0;
+        }
+        
+        _move = Vector3.ClampMagnitude(_move, _speed);
+    }
 
-        _velocity.y += gravity * Time.deltaTime;
+    void AirMovement()
+    {
+        _move.x += _input.x * airSpeed;
+        _move.z += _input.z * airSpeed;
 
-        controller.Move(_velocity * Time.deltaTime);
+        _move = Vector3.ClampMagnitude(_move, _speed);
+    }
+
+    void CheckGround()
+    {
+        _isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        if (_isGrounded && _yVelocity.y < 0)
+        {
+            jumpCharges = 2;
+            _yVelocity.y = 0.2f;
+        } 
+    }
+
+    void ApplyGravity() 
+    {
+        gravity = normalGravity;
+        _yVelocity.y += gravity * Time.deltaTime;
+        _controller.Move(_yVelocity * Time.deltaTime);
+    }
+
+    void Jump()
+    {
+        _yVelocity.y = Mathf.Sqrt(jumpHeight * -2f * normalGravity);
+        jumpCharges--;
     }
 }
+
