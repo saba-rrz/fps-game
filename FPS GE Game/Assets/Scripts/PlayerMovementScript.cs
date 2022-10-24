@@ -23,9 +23,13 @@ public class PlayerMovementScript : MonoBehaviour
     private Vector3 _move;
     private Vector3 _input;
     private Vector3 _yVelocity;
+    private Vector3 _crouchingCenter = new Vector3(0, 0.65f, 0);
+    private Vector3 _standingCenter = new Vector3(0, 0, 0);
 
     
     private float _speed;
+    private float _startHeight;
+    private const float CrouchHeight = 0.65f;
     private bool _isGrounded;
     private bool _isCrouching;
     private bool _isSprinting;
@@ -34,6 +38,7 @@ public class PlayerMovementScript : MonoBehaviour
     private void Start()
     {
         _controller = GetComponent<CharacterController>();
+        _startHeight = transform.localScale.y;
     }
 
     void HandleInput()
@@ -43,7 +48,7 @@ public class PlayerMovementScript : MonoBehaviour
         _input = transform.TransformDirection(_input);
         _input = Vector3.ClampMagnitude(_input, 1f);
 
-        if (Input.GetKeyUp(KeyCode.Space) && jumpCharges > 0)
+        if (Input.GetKeyDown(KeyCode.Space) && jumpCharges > 0)
         {
             Jump();
         }
@@ -52,10 +57,20 @@ public class PlayerMovementScript : MonoBehaviour
         {
             Crouch();
         }
-
+        
         if (Input.GetKeyUp(KeyCode.LeftControl))
         {
             ExitCrouch();
+        }
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) && _isGrounded)
+        {
+            _isSprinting = true;
+        }
+
+        if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            _isSprinting = false;
         }
     }
 
@@ -78,7 +93,7 @@ public class PlayerMovementScript : MonoBehaviour
 
     void GroundedMovement()
     {
-        _speed = _isSprinting ? sprintSpeed : _isCrouching ? crouchSpeed : runSpeed;
+        _speed = _isSprinting ? sprintSpeed : _isCrouching && _isGrounded ? crouchSpeed : runSpeed;
         if (_input.x != 0)
         {
             _move.x += _input.x * _speed;
@@ -133,7 +148,18 @@ public class PlayerMovementScript : MonoBehaviour
 
     void Crouch()
     {
-        
+        _controller.height = CrouchHeight;
+        _controller.center = _crouchingCenter;
+        transform.localScale = new Vector3(transform.localScale.x, CrouchHeight, transform.localScale.z);
+        _isCrouching = true;
+    }
+
+    void ExitCrouch()
+    {
+        _controller.height = (_startHeight * 2);
+        _controller.center = _standingCenter;
+        transform.localScale = new Vector3(transform.localScale.x, _startHeight, transform.localScale.z);
+        _isCrouching = false;
     }
 
     void Sprinting()
