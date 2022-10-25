@@ -161,10 +161,5 @@ public class PlayerMovementScript : MonoBehaviour
         transform.localScale = new Vector3(transform.localScale.x, _startHeight, transform.localScale.z);
         _isCrouching = false;
     }
-
-    void Sprinting()
-    {
-        
-    }
 }
 
