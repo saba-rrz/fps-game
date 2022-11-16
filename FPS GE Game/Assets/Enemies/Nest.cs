@@ -19,8 +19,9 @@ public class Nest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.T))
+        if(GameObject.Find("Zombie Walk") ==null)
         {
+            
             SpawnEnemy();
         }
     }
