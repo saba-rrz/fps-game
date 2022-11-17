@@ -8,6 +8,7 @@ public class Movement : MonoBehaviour
 
     private NavMeshAgent agent = null;
     [SerializeField] private Transform target;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -18,6 +19,7 @@ public class Movement : MonoBehaviour
     void Update()
     {
         MoveToTarget();
+        CheckDistance();
     }
     private void MoveToTarget()
     {
@@ -32,5 +34,14 @@ public class Movement : MonoBehaviour
     private void GetReferences()
     {
         agent=GetComponent<NavMeshAgent>();
+    }
+
+    private bool CheckDistance()
+    {
+        if (agent.stoppingDistance <= 3f)
+        {
+            return true;
+        }
+        return false;
     }
 }
