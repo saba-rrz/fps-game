@@ -1,46 +1,37 @@
-
+using Palmmedia.ReportGenerator.Core.Reporting.Builders;
 using UnityEngine;
 
 public class Gun : MonoBehaviour
 {
+    [SerializeField] private float damage = 10f;
+    [SerializeField] private float range = 100f;
 
-
-
-    public float damage;
-    public float range;
-    public Camera fpsCam;
+    public Camera playerCamera;
     public ParticleSystem muzzleFlash;
-    
-    private void Start()
-    {
-        damage = 10f;
-        range = 100f;
-    }
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetButton("Fire1"))
         {
             Shoot();
         }
+    }
 
-
-        void Shoot()
+    // ReSharper disable Unity.PerformanceAnalysis
+    void Shoot()
+    {
+        muzzleFlash.Play();
+        
+        RaycastHit raycastHit;
+        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out raycastHit, range))
         {
+            Debug.Log(raycastHit.transform.name);
 
-            muzzleFlash.Play();
-            RaycastHit hit;
-            if (Physics.Raycast(fpsCam.transform.position, fpsCam.transform.forward, out hit, range))
+            Target target = raycastHit.transform.GetComponent<Target>();
+
+            if (target != null)
             {
-                Debug.Log(hit.transform.name);
-
-                Target target = hit.transform.GetComponent<Target>();
-
-                if (target != null)
-                {
-                    target.TakeDamage(damage);
-                }
+                target.TakeDamage(damage);
             }
-
         }
     }
 }
