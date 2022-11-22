@@ -1,15 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class MouseLook : MonoBehaviour
 {
-    [SerializeField] private float mouseSense = 100f;
+    public float mixX = -60f;
 
-    public Transform playerBody;
+    public float maxX = 60f;
 
-    private float _xRotation = 0f;
-    
+    public float sensitivity;
+
+    public Camera Camera;
+
+    private float _rotY = 0f;
+
+    private float _rotX = 0f;
     // Start is called before the first frame update
     void Start()
     {
@@ -20,14 +26,12 @@ public class MouseLook : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSense * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSense * Time.deltaTime;
+        _rotY += Input.GetAxis("Mouse X") * sensitivity;
+        _rotX += Input.GetAxis("Mouse Y") * sensitivity;
 
-        _xRotation -= mouseY;
-        _xRotation = Mathf.Clamp(_xRotation, -60f, 60f);
-        
-        transform.localRotation = Quaternion.Euler(_xRotation,0f ,0f);
-        playerBody.Rotate(Vector3.up * mouseX);
+        _rotX = Mathf.Clamp(_rotX, mixX, maxX);
 
+        transform.localEulerAngles = new Vector3(0, _rotY, 0);
+        Camera.transform.localEulerAngles = new Vector3(-_rotX, 0, 0);
     }
 }
