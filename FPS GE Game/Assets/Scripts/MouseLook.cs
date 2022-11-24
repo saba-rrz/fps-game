@@ -1,32 +1,45 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MouseLook : MonoBehaviour
 {
-    [SerializeField] private float mouseSense = 100f;
-
-    public Transform playerBody;
-
-    private float _xRotation = 0f;
+    #region Settings
     
-    // Start is called before the first frame update
-    void Start()
+    [Header("Cameras")]
+    [SerializeField] private Camera mainCamera; //Main camera
+    [SerializeField] private Camera gunCamera; //Gun camera
+    
+    [Header("Settings")]
+    [SerializeField] private float sensitivity; //Sensitivity value
+    
+    #endregion
+
+    #region Variables
+
+    private const float MixX = -60f; //Min X rotation
+    private const float MaxX = 60f; //Max X rotation
+    private float _rotY; //Y rotation
+    private float _rotX; //X rotation
+    private PlayerMovementScript _moveScript; //PlayerMovementScript component
+    
+    #endregion
+    
+    void Start() //Start Function
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.lockState = CursorLockMode.Locked; //Locks the cursor in place
+        Cursor.visible = false; //Turns off the cursor
+
+        _moveScript = GetComponent<PlayerMovementScript>(); //Gets the PlayerMovementScript component
     }
-
-    // Update is called once per frame
-    void Update()
+    
+    void Update() //Update Function
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSense * Time.deltaTime;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSense * Time.deltaTime;
+        _rotY += Input.GetAxis("Mouse X") * sensitivity; //Handles the input from the mouse
+        _rotX += Input.GetAxis("Mouse Y") * sensitivity; //Handles the input from the mouse
 
-        _xRotation -= mouseY;
-        _xRotation = Mathf.Clamp(_xRotation, -60f, 60f);
-        
-        transform.localRotation = Quaternion.Euler(_xRotation,0f ,0f);
-        playerBody.Rotate(Vector3.up * mouseX);
+        _rotX = Mathf.Clamp(_rotX, MixX, MaxX); //Clamps the camera  with the Min and Max values
 
+        transform.localEulerAngles = new Vector3(0, _rotY, 0); //Moves the cameras
+        mainCamera.transform.localEulerAngles = new Vector3(-_rotX, 0, _moveScript.tilt); //Moves the main camera
+        gunCamera.transform.localEulerAngles = new Vector3(-_rotX, 0, _moveScript.tilt); //Moves the gun camera
     }
 }

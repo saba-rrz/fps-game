@@ -971,8 +971,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 625c4fe100761374dbaee3b0c8d73dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mouseSense: 100
-  playerBody: {fileID: 963194228}
+  mixX: -60
+  maxX: 60
+  sensitivity: 0
+  Camera: {fileID: 0}
 --- !u!114 &148328135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -985,10 +987,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 994203e05881da24a877b2beb80b9d37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 0
-  range: 0
-  fpsCam: {fileID: 963194227}
-  muzzleFlash: {fileID: 740826638}
+  damage: 10
+  range: 100
+  playerCamera: {fileID: 0}
+  muzzleFlash: {fileID: 0}
 --- !u!114 &148328136
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15817,6 +15819,7 @@ GameObject:
   - component: {fileID: 962723669}
   - component: {fileID: 962723671}
   - component: {fileID: 962723672}
+  - component: {fileID: 962723673}
   m_Layer: 0
   m_Name: FPS Player
   m_TagString: Untagged
@@ -15874,19 +15877,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4e81b2bcca141146958edb4a0e4c348, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  runSpeed: 12
-  sprintSpeed: 0
-  crouchSpeed: 0
-  jumpCharges: 0
-  jumpHeight: 3
-  gravity: 0
-  normalGravity: -26
-  airSpeed: 0.3
+  controller: {fileID: 0}
   groundCheck: {fileID: 790847653}
   groundMask:
     serializedVersion: 2
     m_Bits: 64
-  groundDistance: 0.4
+  wallMask:
+    serializedVersion: 2
+    m_Bits: 0
+  speed: 0
+  runSpeed: 12
+  sprintSpeed: 0
+  crouchSpeed: 0
+  airSpeed: 0.3
+  climbSpeed: 0
+  normalGravity: -26
+  wallRunGravity: 0
+  jumpHeight: 3
+  slideSpeedIncrease: 0
+  wallRunSpeedIncrease: 0
+  slideSpeedDecrease: 0
+  wallRunSpeedDecrease: 0
+  maxSlideTimer: 0
+  maxClimbTimer: 0
+  maxWallJumpTimer: 0
+  playerCamera: {fileID: 0}
+  specialFOV: 0
+  cameraChangeTime: 0
+  wallRunTilt: 0
+  tilt: 0
 --- !u!114 &962723672
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15900,9 +15919,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 10
-  range: 0
-  fpsCam: {fileID: 963194227}
+  range: 100
+  playerCamera: {fileID: 963194227}
   muzzleFlash: {fileID: 740826638}
+--- !u!114 &962723673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 962723668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 625c4fe100761374dbaee3b0c8d73dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mixX: -60
+  maxX: 60
+  sensitivity: 2
+  Camera: {fileID: 963194227}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -15914,7 +15949,6 @@ GameObject:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
-  - component: {fileID: 963194229}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -15988,20 +16022,6 @@ Transform:
   m_Father: {fileID: 962723670}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &963194229
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 963194225}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 625c4fe100761374dbaee3b0c8d73dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mouseSense: 250
-  playerBody: {fileID: 962723670}
 --- !u!1 &973258185
 GameObject:
   m_ObjectHideFlags: 0
@@ -17900,10 +17920,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 994203e05881da24a877b2beb80b9d37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 5
-  range: 0
-  fpsCam: {fileID: 963194227}
-  muzzleFlash: {fileID: 740826638}
+  damage: 10
+  range: 100
+  playerCamera: {fileID: 963194227}
+  muzzleFlash: {fileID: 0}
 --- !u!114 &1548850914
 MonoBehaviour:
   m_ObjectHideFlags: 0

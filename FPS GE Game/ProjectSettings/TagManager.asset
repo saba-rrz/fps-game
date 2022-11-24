@@ -8,13 +8,13 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Walls
   - Water
   - UI
   - Ground
-  - 
-  - 
-  - 
+  - SecondCamera
+  - Post Processing
+  - GunLayer
   - 
   - 
   - 
