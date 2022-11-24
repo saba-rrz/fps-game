@@ -1,9 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-using UnityEngine.Serialization;
+
 
 public class PlayerMovementScript : MonoBehaviour
 {
@@ -12,77 +8,137 @@ public class PlayerMovementScript : MonoBehaviour
     #region Components
 
     //Components
-    public CharacterController controller; //Unity Character Controller
+    [Header("Components")] public CharacterController controller; //Unity Character Controller
     public Transform groundCheck; //Transform to get the GroundCheck object
+    public Camera playerCamera; //Player Camera component
 
     #endregion
-    public LayerMask groundMask;
-    public LayerMask wallMask;
- 
-    Vector3 _move;
-    Vector3 _input;
-    Vector3 _yVelocity;
-    Vector3 _forwardDirection;
 
-    [FormerlySerializedAs("_speed")] [SerializeField] float speed;
+    #region Layer Masks
 
-    public float runSpeed;
-    public float sprintSpeed;
-    public float crouchSpeed;
-    public float airSpeed;
-    public float climbSpeed;
+    //Layer Masks
+    [Header("Layer Masks")] [SerializeField]
+    private LayerMask groundMask; //LayerMask to detects objects that have the ground layer
 
-    float _gravity;
-    public float normalGravity;
-    public float wallRunGravity;
-    public float jumpHeight;
+    [SerializeField] private LayerMask wallMask; //LayerMask to detects objects that have the wall layer
 
-    public float slideSpeedIncrease;
-    public float wallRunSpeedIncrease;
-    public float slideSpeedDecrease;
-    public float wallRunSpeedDecrease;
+    #endregion
 
-    int _jumpCharges;
+    #region Vectors
 
-    bool _isSprinting;
-    bool _isCrouching;
-    bool _isSliding;
-    bool _isWallRunning;
-    bool _isGrounded;
+    //Vectors
+    private readonly Vector3 _crouchingCenter = new Vector3(0, 0.5f, 0);
+    private readonly Vector3 _standingCenter = new Vector3(0, 0, 0);
+    private Vector3 _wallNormal;
+    private Vector3 _lastWall;
+    private Vector3 _move;
+    private Vector3 _input;
+    private Vector3 _yVelocity;
+    private Vector3 _forwardDirection;
 
-    float _startHeight;
-    float _crouchHeight = 0.5f;
-    float _slideTimer;
-    public float maxSlideTimer;
-    Vector3 _crouchingCenter = new Vector3(0, 0.5f, 0);
-    Vector3 _standingCenter = new Vector3(0, 0, 0);
+    #endregion
 
-    bool _onLeftWall;
-    bool _onRightWall;
-    bool _hasWallRun = false;
+    #region Raycasts
+
     private RaycastHit _leftWallHit;
     private RaycastHit _rightWallHit;
-    Vector3 _wallNormal;
-    Vector3 _lastWall;
-
-    bool _isClimbing;
-    bool _hasClimbed;
-    bool _canClimb;
     private RaycastHit _wallHit;
 
-    float _climbTimer;
+    #endregion
+
+    #region Crouch Variabls
+
+    private float _startHeight;
+    private const float CrouchHeight = 0.5f;
+
+    #endregion
+
+    #region Speed Settings
+
+    //Speed Settings 
+    [Header("Speed Settings")] [SerializeField]
+    private float speed;
+
+    [SerializeField] private float runSpeed;
+    [SerializeField] private float sprintSpeed;
+    [SerializeField] private float crouchSpeed;
+    [SerializeField] private float airSpeed;
+    [SerializeField] private float climbSpeed;
+
+    #endregion
+
+    #region Gravity Settings
+    
+    [Header("Gravity Settings")]
+    [SerializeField] private float normalGravity;
+    [SerializeField] private float wallRunGravity;
+    private float _gravity;
+
+    #endregion
+
+    #region Jump Settings
+    
+    [Header("Jump Settings")]
+    [SerializeField] private float jumpHeight;
+    private int _jumpCharges;
+
+    #endregion
+
+    #region Slide Settings
+    
+    [Header("Slide Settings")]
+    [SerializeField] private float slideSpeedIncrease;
+    [SerializeField] private float slideSpeedDecrease;
+    [SerializeField] private float slideTimer;
+    [SerializeField] private float maxSlideTimer;
+
+    #endregion
+
+    #region Bools
+
+    private bool _isSprinting;
+    private bool _isCrouching;
+    private bool _isSliding;
+    private bool _isWallRunning;
+    private bool _isGrounded;
+    private bool _onLeftWall;
+    private bool _onRightWall;
+    private bool _hasWallRun;
+    private bool _isClimbing;
+    private bool _hasClimbed;
+    private bool _canClimb;
+    private bool _isWallJumping;
+
+    #endregion
+
+    #region Wall Run Settings
+    
+    [Header("Wall Running Settings")]
+    [SerializeField] private float wallRunSpeedIncrease;
+    [SerializeField] private float wallRunSpeedDecrease;
+    [SerializeField] private float maxWallJumpTimer;
+    private float _wallJumpTimer;
+    
+    #endregion
+
+    #region Climbing Settings
+    
+    [Header("Climbing Settings")]
+    [SerializeField] private float climbTimer;
     public float maxClimbTimer;
 
-    bool _isWallJumping;
-    float _wallJumpTimer;
-    public float maxWallJumpTimer;
+    #endregion
 
-    public Camera playerCamera;
-    float _normalFOV;
-    public float specialFOV;
-    public float cameraChangeTime;
-    public float wallRunTilt;
-    public float tilt;
+    #region Camera Settings
+    [Header("Camera Settings")]
+    [SerializeField] private float specialFOV;
+    [SerializeField] private float cameraChangeTime;
+    [SerializeField] private float wallRunTilt;
+    [SerializeField] public float tilt;
+    private float _normalFOV;
+
+    #endregion
+    
     #endregion
 
 
@@ -124,8 +180,8 @@ public class PlayerMovementScript : MonoBehaviour
         {
             SlideMovement(); // Calls the sliding movement function
             DecreaseSpeed(slideSpeedDecrease); //Calls the speed decrease function
-            _slideTimer -= 1f * Time.deltaTime; // Timer for sliding time
-            if (_slideTimer < 0) // If the timer runs out
+            slideTimer -= 1f * Time.deltaTime; // Timer for sliding time
+            if (slideTimer < 0) // If the timer runs out
             {
                 _isSliding = false; // Sets sliding to false
             }
@@ -138,13 +194,14 @@ public class PlayerMovementScript : MonoBehaviour
         else if (_isClimbing)
         {
             ClimbMovement();
-            _climbTimer -= 1f * Time.deltaTime;
-            if (_climbTimer < 0)
+            climbTimer -= 1f * Time.deltaTime;
+            if (climbTimer < 0)
             {
                 _isClimbing = false;
                 _hasClimbed = true;
             }
         }
+        
         
         controller.Move(_move * Time.deltaTime); //Character movement independent of frame-rate
         ApplyGravity(); // Applies gravity using the Gravity function
@@ -174,7 +231,7 @@ public class PlayerMovementScript : MonoBehaviour
             }
         }
 
-        if (!_isWallJumping)
+        if (!_isWallRunning)
         {
             tilt = Mathf.Lerp(tilt, 0f, cameraChangeTime * Time.deltaTime);
         }
@@ -227,14 +284,17 @@ public class PlayerMovementScript : MonoBehaviour
             _jumpCharges = 1;
             _hasWallRun = false;
             _hasClimbed = false;
-            _climbTimer = maxClimbTimer;
+            climbTimer = maxClimbTimer;
         }
     }
 
     void CheckWallRun()
     {
-        _onRightWall = Physics.Raycast(transform.position, transform.right, out _rightWallHit, 0.7f, wallMask);
-        _onLeftWall = Physics.Raycast(transform.position, -transform.right, out _leftWallHit, 0.7f, wallMask);
+        var playerTransform = transform;
+        var position = playerTransform.position;
+        var right = playerTransform.right;
+        _onRightWall = Physics.Raycast(position, right, out _rightWallHit, 0.7f, wallMask);
+        _onLeftWall = Physics.Raycast(position, -right, out _leftWallHit, 0.7f, wallMask);
 
         if ((_onRightWall || _onLeftWall) && !_isWallRunning)
         {
@@ -248,7 +308,8 @@ public class PlayerMovementScript : MonoBehaviour
     
     void CheckClimbing()
     {
-        _canClimb = Physics.Raycast(transform.position, transform.forward, out _wallHit, 0.7f, wallMask);
+        var playerTransform = transform;
+        _canClimb = Physics.Raycast(playerTransform.position, playerTransform.forward, out _wallHit, 0.7f, wallMask);
         float wallAngle = Vector3.Angle(-_wallHit.normal, transform.forward);
         if (wallAngle < 15 && _canClimb && !_hasClimbed)
         {
@@ -340,10 +401,14 @@ public class PlayerMovementScript : MonoBehaviour
     
     void Crouch()
     {
-        controller.height = _crouchHeight;
+        controller.height = CrouchHeight;
         controller.center = _crouchingCenter;
-        transform.localScale = new Vector3(transform.localScale.x, _crouchHeight, transform.localScale.z);
-        if (speed > runSpeed)
+        var playerTransform = transform;
+        var localScale = playerTransform.localScale;
+        
+        localScale = new Vector3(localScale.x, CrouchHeight, localScale.z);
+        playerTransform.localScale = localScale;
+        if (speed >  (runSpeed * 0.95))
         {
             _isSliding = true;
             _forwardDirection = transform.forward;
@@ -352,7 +417,7 @@ public class PlayerMovementScript : MonoBehaviour
                 IncreaseSpeed(slideSpeedIncrease);
             }
 
-            _slideTimer = maxSlideTimer;
+            slideTimer = maxSlideTimer;
         }
         _isCrouching = true;
     }
@@ -361,7 +426,11 @@ public class PlayerMovementScript : MonoBehaviour
     {
         controller.height = (_startHeight * 2);
         controller.center = _standingCenter;
-        transform.localScale = new Vector3(transform.localScale.x, _startHeight, transform.localScale.z);
+        var playerTransform = transform;
+        var localScale = playerTransform.localScale;
+        
+        localScale = new Vector3(localScale.x, _startHeight, localScale.z);
+        playerTransform.localScale = localScale;
         _isCrouching = false;
         _isSliding = false;
     }
@@ -416,18 +485,21 @@ public class PlayerMovementScript : MonoBehaviour
         }
         else if (_isWallRunning)
         {
+            //IncreaseSpeed(wallRunSpeedIncrease);
             ExitWallRun();
-            IncreaseSpeed(wallRunSpeedIncrease);
         }
         _hasClimbed = false;
-        _climbTimer = maxClimbTimer;
+        climbTimer = maxClimbTimer;
         _yVelocity.y = Mathf.Sqrt(jumpHeight * -2f * normalGravity);
     }
 
     void ApplyGravity() 
     {
         _gravity = _isWallRunning ? wallRunGravity : _isClimbing ? 0f : normalGravity;
-        _yVelocity.y += _gravity * Time.deltaTime;
+        if (_yVelocity.y > _gravity)
+        {
+            _yVelocity.y += _gravity * Time.deltaTime; 
+        }
         controller.Move(_yVelocity * Time.deltaTime);
     }
 }
