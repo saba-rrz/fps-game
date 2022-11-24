@@ -19,7 +19,7 @@ public class Movement : MonoBehaviour
     void Update()
     {
         MoveToTarget();
-        CheckDistance();
+        
     }
     private void MoveToTarget()
     {
@@ -36,12 +36,5 @@ public class Movement : MonoBehaviour
         agent=GetComponent<NavMeshAgent>();
     }
 
-    private bool CheckDistance()
-    {
-        if (agent.stoppingDistance <= 3f)
-        {
-            return true;
-        }
-        return false;
-    }
+
 }
