@@ -96,7 +96,6 @@ public class PlayerMovementScript : MonoBehaviour
 
     #region Bools
 
-    public bool disabled;
     private bool _isSprinting;
     private bool _isCrouching;
     private bool _isSliding;
@@ -145,7 +144,7 @@ public class PlayerMovementScript : MonoBehaviour
 
 
     // Start function
-    private void Start() 
+    private void Start()
     {
         controller = GetComponent<CharacterController>();
         _startHeight = transform.localScale.y;
@@ -166,47 +165,44 @@ public class PlayerMovementScript : MonoBehaviour
     //Update functions
     private void Update()
     {
-        if (!disabled)
+        HandleInput(); // Calls the input function
+        CheckWallRun(); // Constantly checks if player is wall running
+        CheckClimbing(); // Constantly checks if player is climbing
+        if (_isGrounded && !_isSliding) //Checks if on the ground and not sliding; uses the ground movement
         {
-            HandleInput(); // Calls the input function
-            CheckWallRun(); // Constantly checks if player is wall running
-            CheckClimbing(); // Constantly checks if player is climbing
-            if (_isGrounded && !_isSliding) //Checks if on the ground and not sliding; uses the ground movement
+            GroundedMovement(); //Calls ground movement function
+        }
+        else if (!_isGrounded && !_isWallRunning && !_isClimbing) //If not on the ground use air movement
+        {
+            AirMovement(); // Calls air movement function
+        }
+        else if (_isSliding) //If sliding use sliding movement
+        {
+            SlideMovement(); // Calls the sliding movement function
+            DecreaseSpeed(slideSpeedDecrease); //Calls the speed decrease function
+            slideTimer -= 1f * Time.deltaTime; // Timer for sliding time
+            if (slideTimer < 0) // If the timer runs out
             {
-                GroundedMovement(); //Calls ground movement function
-            }
-            else if (!_isGrounded && !_isWallRunning && !_isClimbing) //If not on the ground use air movement
-            {
-                AirMovement(); // Calls air movement function
-            }
-            else if (_isSliding) //If sliding use sliding movement
-            {
-                SlideMovement(); // Calls the sliding movement function
-                DecreaseSpeed(slideSpeedDecrease); //Calls the speed decrease function
-                slideTimer -= 1f * Time.deltaTime; // Timer for sliding time
-                if (slideTimer < 0) // If the timer runs out
-                {
-                    _isSliding = false; // Sets sliding to false
-                }
-            }
-            else if (_isWallRunning)
-            {
-                WallRunningMovement();
-                DecreaseSpeed(wallRunSpeedDecrease);
-            }
-            else if (_isClimbing)
-            {
-                ClimbMovement();
-                climbTimer -= 1f * Time.deltaTime;
-                if (climbTimer < 0)
-                {
-                    _isClimbing = false;
-                    _hasClimbed = true;
-                }
+                _isSliding = false; // Sets sliding to false
             }
         }
-
-
+        else if (_isWallRunning)
+        {
+            WallRunningMovement();
+            DecreaseSpeed(wallRunSpeedDecrease);
+        }
+        else if (_isClimbing)
+        {
+            ClimbMovement();
+            climbTimer -= 1f * Time.deltaTime;
+            if (climbTimer < 0)
+            {
+                _isClimbing = false;
+                _hasClimbed = true;
+            }
+        }
+        
+        
         controller.Move(_move * Time.deltaTime); //Character movement independent of frame-rate
         ApplyGravity(); // Applies gravity using the Gravity function
         CameraEffects();
