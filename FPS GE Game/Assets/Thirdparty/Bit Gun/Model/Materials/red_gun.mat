@@ -67,15 +67,8 @@ Material:
     m_Ints: []
     m_Floats:
     - PixelSnap: 0
-    - _ColorMask: 15
     - _EmissionLM: 0
     - _Shininess: 0.01
-    - _Stencil: 0
-    - _StencilComp: 8
-    - _StencilOp: 0
-    - _StencilReadMask: 255
-    - _StencilWriteMask: 255
-    - _UseUIAlphaClip: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Emission: {r: 0.4852941, g: 0.24978374, b: 0.24978374, a: 0}
