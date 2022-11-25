@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Target : MonoBehaviour
 {
-    [SerializeField] private float health = 50f;
+    [SerializeField] private float health;
 
     public void TakeDamage (float amount)
     {

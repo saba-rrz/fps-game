@@ -37,7 +37,11 @@ public class Gun : MonoBehaviour
     }
     private void Update()
     {
+<<<<<<< Updated upstream
         if (IsReloading)
+=======
+        if (Input.GetButtonDown("Fire1"))
+>>>>>>> Stashed changes
         {
             return;
 

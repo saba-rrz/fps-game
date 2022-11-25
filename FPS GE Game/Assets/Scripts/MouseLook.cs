@@ -5,12 +5,12 @@ public class MouseLook : MonoBehaviour
     #region Settings
     
     [Header("Cameras")]
-    [SerializeField] private Camera mainCamera; //Main camera
-    [SerializeField] private Camera gunCamera; //Gun camera
+    public Camera mainCamera; //Main camera
+    public Camera gunCamera; //Gun camera
     
     [Header("Settings")]
     [SerializeField] private float sensitivity; //Sensitivity value
-    
+
     #endregion
 
     #region Variables
