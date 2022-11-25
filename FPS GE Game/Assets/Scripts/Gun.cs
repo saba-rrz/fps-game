@@ -53,7 +53,7 @@ public class Gun : MonoBehaviour
         {
             nextTimeToFire = Time.time + 1f / fireRate;
             Shoot();
-           
+        
             
         }
     }

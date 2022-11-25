@@ -15,9 +15,9 @@ public class WeaponUI : MonoBehaviour
     {
         DisplayBullets(bullets);
     }
-    private void DisplayBullets(int index)
+    public void DisplayBullets(int index)
     {
-        for(int i = 0; i < bulletArray.Length; i++)
+        for (int i = 0; i < bulletArray.Length; i++)
         {
             if (i < bullets)
             {
