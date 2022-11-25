@@ -7,25 +7,28 @@ using UnityEngine.UI;
 
 public class WeaponUI : MonoBehaviour
 {
-   
-    public int bullets = 3;
-    public GameObject[] bulletArray;
 
-    private void Update()
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private GameObject missingBulletPrefab;
+
+    public void DrawBullets(int bullets, int maxBullets)
     {
-        DisplayBullets(bullets);
-    }
-    public void DisplayBullets(int index)
-    {
-        for (int i = 0; i < bulletArray.Length; i++)
+        foreach (Transform child in transform)
         {
-            if (i < bullets)
+            Destroy(child.gameObject);
+        }
+
+        for (int i = 0; i < maxBullets; i++)
+        {
+            if (i + 1 <= bullets)
             {
-                bulletArray[i].SetActive(true);
+                GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+                bullet.transform.parent = transform;
             }
             else
             {
-                bulletArray[i].SetActive(false);
+                GameObject bullet = Instantiate(missingBulletPrefab, transform.position, Quaternion.identity);
+                bullet.transform.parent = transform;
             }
         }
     }

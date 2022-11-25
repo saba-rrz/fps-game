@@ -46,10 +46,10 @@ public class PlayerMovementScript : MonoBehaviour
 
     #endregion
 
-    #region Crouch Variabls
+    #region Crouch Variables
 
     private float _startHeight;
-    private const float CrouchHeight = 0.5f;
+    public float crouchHeight = 0.5f;
 
     #endregion
 
@@ -401,12 +401,12 @@ public class PlayerMovementScript : MonoBehaviour
     
     void Crouch()
     {
-        controller.height = CrouchHeight;
+        controller.height = crouchHeight;
         controller.center = _crouchingCenter;
         var playerTransform = transform;
         var localScale = playerTransform.localScale;
         
-        localScale = new Vector3(localScale.x, CrouchHeight, localScale.z);
+        localScale = new Vector3(localScale.x, crouchHeight, localScale.z);
         playerTransform.localScale = localScale;
         if (speed >  (runSpeed * 0.95))
         {
