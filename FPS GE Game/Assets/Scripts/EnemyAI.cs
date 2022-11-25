@@ -12,19 +12,19 @@ public class EnemyAI : MonoBehaviour
     public LayerMask groundMask, playerMask;
 
     //Patroling
-    public Vector3 WalkPoint;
-    private bool walkPointSet;
+    public Vector3 walkPoint;
+    private bool _walkPointSet;
     public float walkPointRange;
     
     //Attacking
     public float timeBetweenShots, spread, projectileForce;
     private bool _attacked;
     public GameObject projectile;
-    public Transform attackPoint;
-    public Camera aiCamera;
+    // public Transform attackPoint;
+    // public Camera aiCamera;
 
     public float sightRange, attackRange;
-    public bool _playerSighted, _playerInRange;
+    public bool playerSighted, playerInRange;
 
     private void Awake()
     {
@@ -37,29 +37,29 @@ public class EnemyAI : MonoBehaviour
         //Check for player in attack
         var position = transform.position;
         
-        _playerSighted = Physics.CheckSphere(position, sightRange, playerMask);
-        _playerInRange = Physics.CheckSphere(position, attackRange, playerMask);
+        playerSighted = Physics.CheckSphere(position, sightRange, playerMask);
+        playerInRange = Physics.CheckSphere(position, attackRange, playerMask);
         
-        if (!_playerSighted && !_playerInRange) Patrol();
-        if (_playerSighted && !_playerInRange) ChasePlayer();
-        if (_playerSighted && _playerInRange) AttackPlayer();
+        if (!playerSighted && !playerInRange) Patrol();
+        if (playerSighted && !playerInRange) ChasePlayer();
+        if (playerSighted && playerInRange) AttackPlayer();
     }
 
     private void Patrol()
     {
-        if (!walkPointSet) SearchWalkPoint();
+        if (!_walkPointSet) SearchWalkPoint();
 
-        if (walkPointSet)
+        if (_walkPointSet)
         {
-            agent.SetDestination(WalkPoint);
+            agent.SetDestination(walkPoint);
         }
 
-        Vector3 distanceToPoint = transform.position - WalkPoint;
+        Vector3 distanceToPoint = transform.position - walkPoint;
         
         //WalkPoint Reached
         if (distanceToPoint.magnitude < 1f)
         {
-            walkPointSet = false;
+            _walkPointSet = false;
         }
         
     }
@@ -70,11 +70,11 @@ public class EnemyAI : MonoBehaviour
         float randomXRange = Random.Range(-walkPointRange, walkPointRange);
 
         var position = transform.position;
-        WalkPoint = new Vector3(position.x + randomXRange, position.y, position.z + randomZRange);
+        walkPoint = new Vector3(position.x + randomXRange, position.y, position.z + randomZRange);
 
-        if (Physics.Raycast(WalkPoint, -transform.up, 2f, groundMask))
+        if (Physics.Raycast(walkPoint, -transform.up, 2f, groundMask))
         {
-            walkPointSet = true;
+            _walkPointSet = true;
         }
 
     }
@@ -90,42 +90,22 @@ public class EnemyAI : MonoBehaviour
     {
         agent.SetDestination(transform.position);
         
-        transform.LookAt(player);
+        transform.LookAt(player.position + transform.forward);
 
         if (!_attacked)
         {
+            Rigidbody rb = Instantiate(projectile, transform.position + Vector3.left, Quaternion.identity).GetComponent<Rigidbody>();
+            rb.AddForce(transform.forward * projectileForce, ForceMode.Impulse);
            
-            Ray ray = aiCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-            RaycastHit hit;
-
-            Vector3 targetPoint;
-            if (Physics.Raycast(ray, out hit))
-            {
-                targetPoint = hit.point;
-            }
-            else
-            {
-                targetPoint = ray.GetPoint(125);
-            }
-
-            var position = attackPoint.position;
-            Vector3 directionWithoutSpred = targetPoint - position;
-
-            float x = Random.Range(-spread, spread);
-            float y = Random.Range(-spread, spread);
-
-            Vector3 directionWithSpread = directionWithoutSpred + new Vector3(x, y, 0);
-            
-            GameObject currentBullet = Instantiate(projectile, position, Quaternion.identity);
-            currentBullet.transform.forward = directionWithSpread.normalized;
-            
-            currentBullet.GetComponent<Rigidbody>().AddForce(directionWithSpread.normalized * projectileForce, ForceMode.Impulse);
            
             _attacked = true;
             Invoke(nameof(ResetAttack), timeBetweenShots);
-            
+
+
         }
     }
+
+    
 
     private void ResetAttack()
     {
