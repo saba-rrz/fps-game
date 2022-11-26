@@ -1,15 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
 using UnityEngine;
-using UnityEngine.UI;
-
 
 public class WeaponUI : MonoBehaviour
 {
 
-    [SerializeField] private GameObject bulletPrefab;
-    [SerializeField] private GameObject missingBulletPrefab;
+    [SerializeField] GameObject bulletPrefab;
+    [SerializeField] GameObject missingBulletPrefab;
 
     public void DrawBullets(int bullets, int maxBullets)
     {
@@ -21,7 +16,7 @@ public class WeaponUI : MonoBehaviour
         for (int i = 0; i < maxBullets; i++)
         {
             if (i + 1 <= bullets)
-            {
+            {  
                 GameObject bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
                 bullet.transform.parent = transform;
             }

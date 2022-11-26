@@ -20,16 +20,17 @@ public class EnemyAI : MonoBehaviour
     public float timeBetweenShots, spread, projectileForce;
     private bool _attacked;
     public GameObject projectile;
-    // public Transform attackPoint;
-    // public Camera aiCamera;
 
     public float sightRange, attackRange;
     public bool playerSighted, playerInRange;
+    public bool isPatroling, isChasing, isAttacking;
+    public Animator chickenAnimator;
 
     private void Awake()
     {
         player = GameObject.Find("FPS Player").transform;
         agent = GetComponent<NavMeshAgent>();
+        chickenAnimator = GetComponent<Animator>();
     }
 
     private void Update()
@@ -51,7 +52,9 @@ public class EnemyAI : MonoBehaviour
 
         if (_walkPointSet)
         {
+            chickenAnimator.SetBool("isAttacking", false);
             agent.SetDestination(walkPoint);
+            
         }
 
         Vector3 distanceToPoint = transform.position - walkPoint;
@@ -88,13 +91,16 @@ public class EnemyAI : MonoBehaviour
     // ReSharper disable Unity.PerformanceAnalysis
     private void AttackPlayer()
     {
+        
+        chickenAnimator.SetBool("isAttacking", true);
         agent.SetDestination(transform.position);
         
         transform.LookAt(player.position + transform.forward);
 
         if (!_attacked)
         {
-            Rigidbody rb = Instantiate(projectile, transform.position + Vector3.left, Quaternion.identity).GetComponent<Rigidbody>();
+            isAttacking = true;
+            Rigidbody rb = Instantiate(projectile, transform.position + Vector3.up, Quaternion.identity).GetComponent<Rigidbody>();
             rb.AddForce(transform.forward * projectileForce, ForceMode.Impulse);
            
            

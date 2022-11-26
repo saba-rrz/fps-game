@@ -80,6 +80,7 @@ public class PlayerMovementScript : MonoBehaviour
     
     [Header("Jump Settings")]
     [SerializeField] private float jumpHeight;
+    [SerializeField] private AudioSource jumpSound;
     private int _jumpCharges;
 
     #endregion
@@ -272,6 +273,7 @@ public class PlayerMovementScript : MonoBehaviour
         
         if (Input.GetKeyDown(KeyCode.Space) && _jumpCharges > 0)
         {
+            jumpSound.Play();
             Jump();
         }
     }

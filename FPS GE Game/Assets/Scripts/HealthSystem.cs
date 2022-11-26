@@ -1,9 +1,9 @@
-using System.Security.Cryptography;
+
 using UnityEngine;
 
 public class HealthSystem : MonoBehaviour
 {
-    // Start is called before the first frame update
+    
     [SerializeField] GameObject healthPrefab;
     [SerializeField] GameObject missingHealthPrefab;
 

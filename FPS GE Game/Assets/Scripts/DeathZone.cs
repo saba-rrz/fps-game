@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,7 +14,22 @@ public class DeathZone : MonoBehaviour
         
    }
 
-   private void ResetGame()
+   private void OnTriggerEnter(Collider other)
+   {
+      if (other.name == "TryAgainCube")
+      {
+         Debug.Log("Try again restart!");
+         ResetGame();
+      }
+
+      if (other.name == "MainMenuCube")
+      {
+         Debug.Log("To main menu");
+         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+      }
+   }
+
+   public void ResetGame()
    {
       SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
    }

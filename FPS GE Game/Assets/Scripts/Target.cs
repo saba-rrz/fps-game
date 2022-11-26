@@ -1,8 +1,11 @@
+using System.Collections;
 using UnityEngine;
 
 public class Target : MonoBehaviour
 {
    public float health = 50f;
+   public AudioSource deathNoise;
+   public PlayerHealth playerHealth;
 
     public void TakeDamage (float amount)
     {
@@ -10,12 +13,16 @@ public class Target : MonoBehaviour
         
         if (health <= 0f)
         {
-            Die();
+            playerHealth.health++;
+            StartCoroutine(Die());
         }
         
     }
-    public void Die()
+
+    IEnumerator Die()
     {
+        deathNoise.Play();
+        yield return new WaitForSeconds(0.5f);
         Destroy(gameObject);
     }
 }

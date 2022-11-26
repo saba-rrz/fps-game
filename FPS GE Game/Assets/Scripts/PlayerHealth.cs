@@ -3,32 +3,55 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
-   public int health = 3;
-   public int maxHealth = 3;
+   public int health ;
+   public int maxHealth;
    [SerializeField] private HealthSystem hsHealthSystem;
+   public AudioSource healthCollect;
+   public AudioSource damageTaken;
+   public DeathZone gameManager;
 
    private void Start()
    {
       hsHealthSystem.DrawHealth(health, maxHealth);
    }
 
-   public void DamagePlayer(int dmg)
+   private void Update()
    {
-      if (health > 0)
+      if (health == 0)
       {
-         health -= dmg;
-         hsHealthSystem.DrawHealth(health, maxHealth);
+         gameManager.ResetGame();
       }
-      
    }
    
-   public void HealPlayer(int heal)
+
+   private void OnTriggerEnter(Collider other)
    {
-      if (health < 0)
+      if (other.gameObject.CompareTag($"Bullets"))
       {
-         health += heal;
-         hsHealthSystem.DrawHealth(health, maxHealth);
+         DamagePlayer(1);
       }
+
+      if (other.gameObject.CompareTag($"Heals"))
+      {
+         HealPlayer(1);
+      }
+   }
+
+   void DamagePlayer(int dmg)
+   {
+      if (health <= 0) return;
+      damageTaken.Play();
+      health -= dmg;
+      hsHealthSystem.DrawHealth(health, maxHealth);
+
+   }
+   
+   void HealPlayer(int heal)
+   {
+      healthCollect.Play();
+      if (health < 1) return;
+      health = maxHealth;
+      hsHealthSystem.DrawHealth(health, maxHealth);
    }
 
 }
